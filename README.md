@@ -34,8 +34,8 @@ To run this application efficiently on your local system, you must have NodeJS a
    Inside the `backend/` folder, create a `.env` file with perfectly matching credentials layout:
    ```env
    JWT_SECRET=generate_a_random_secret_string
-   ADMIN_USERID=saikiranbeesa@gmail.com
-   ADMIN_PASSWORD=Reminder@10
+   ADMIN_USERID=your_desired_admin_email_or_username
+   ADMIN_PASSWORD=your_super_secure_custom_password
    MONGO_URI=your_mongodb_atlas_connection_string
    ```
 
