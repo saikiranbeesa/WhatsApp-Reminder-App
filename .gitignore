@@ -20,3 +20,8 @@ frontend/dist/
 # OS Files
 .DS_Store
 Thumbs.db
+
+# Puppeteer Local Cache
+.cache/
+backend/.cache/
+
