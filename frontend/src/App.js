@@ -187,10 +187,24 @@ function DashboardView({ onLogout }) {
                 <p className="text-slate-400 mt-1">Manage monthly subscriptions securely.</p>
             </div>
         </div>
-        <button onClick={onLogout} className="flex items-center space-x-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-sm font-medium text-slate-300 transition-colors">
-            <LogOut className="w-4 h-4" />
-            <span>Logout</span>
-        </button>
+        <div className="flex items-center space-x-3">
+            <button onClick={async () => {
+                const toastId = toast.loading('Dispatching message...');
+                try {
+                    const res = await axios.get(`${API_URL}/test-reminder`);
+                    toast.success(res.data.message || 'Message sent! Check WhatsApp.', { id: toastId });
+                } catch (e) {
+                    toast.error('Bot offline or not ready.', { id: toastId });
+                }
+            }} className="flex items-center space-x-2 px-4 py-2 bg-blue-900/40 hover:bg-blue-800/60 border border-blue-700 rounded-xl text-sm font-medium text-blue-300 transition-colors">
+                <Mail className="w-4 h-4" />
+                <span>Test Bot</span>
+            </button>
+            <button onClick={onLogout} className="flex items-center space-x-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-sm font-medium text-slate-300 transition-colors">
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
+            </button>
+        </div>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
