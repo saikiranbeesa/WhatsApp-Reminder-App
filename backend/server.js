@@ -70,7 +70,8 @@ app.get('/api/test-reminder', auth.verifyToken, async (req, res) => {
 const buildPath = path.join(__dirname, '../frontend/build');
 app.use(express.static(buildPath));
 
-app.get('*', (req, res) => {
+// Universal fallback to serve the React App for any unhandled GET traffic
+app.use((req, res) => {
     res.sendFile(path.join(buildPath, 'index.html'));
 });
 
