@@ -20,8 +20,17 @@ mongoose.connection.once('open', () => {
             backupSyncIntervalMs: 300000 // Backup session every 5 minutes
         }),
         puppeteer: {
-            // Very important: these args prevent Chromium crashing on Linux Cloud Servers like Render
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
+            // Aggressive Docker flags to completely bypass Render's silent shared memory freezing
+            args: [
+                '--no-sandbox', 
+                '--disable-setuid-sandbox', 
+                '--disable-dev-shm-usage', 
+                '--disable-accelerated-2d-canvas', 
+                '--no-first-run', 
+                '--no-zygote', 
+                '--single-process', 
+                '--disable-gpu'
+            ]
         }
     });
 
