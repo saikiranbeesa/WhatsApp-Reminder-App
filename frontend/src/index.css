@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-950 text-slate-100 font-sans antialiased;
+    background-image: radial-gradient(circle at top right, #1e293b, transparent),
+      radial-gradient(circle at bottom left, #0f172a, transparent);
+    background-attachment: fixed;
+    margin: 0;
+  }
+}
