@@ -33,8 +33,16 @@ function initializeWhatsApp() {
     });
 
     client.on('qr', (qr) => {
-        console.log('QR Code received. Please scan with your WhatsApp to login:');
+        console.log('================================================================');
+        console.log('QR Code received! (Attempting to draw inside terminal...)');
         qrcode.generate(qr, { small: true });
+        
+        // Render logs notoriously distort QR code text heights. We generate a direct graphic link!
+        const cleanQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(qr)}`;
+        console.log('\n🚨 IF THE TERMINAL QR CODE ABOVE IS DISTORTED OR BLURRY:');
+        console.log('Simply click the link below to view it perfectly clear in your browser:');
+        console.log(cleanQrUrl);
+        console.log('================================================================\n');
     });
 
     client.on('remote_session_saved', () => {
