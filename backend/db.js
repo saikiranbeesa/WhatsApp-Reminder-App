@@ -4,7 +4,14 @@ require('dotenv').config();
 const MONGO_URI = process.env.MONGO_URI;
 
 mongoose.connect(MONGO_URI)
-    .then(() => console.log('Connected to MongoDB Cloud Database.'))
+    .then(async () => {
+        console.log('Connected to MongoDB Cloud Database.');
+        await seedDefaultMembers();
+        
+        // Explicity initialize WhatsApp AFTER the database is perfectly online
+        const whatsapp = require('./whatsapp');
+        whatsapp.initializeWhatsApp();
+    })
     .catch((err) => console.error('Failed to connect to MongoDB:', err));
 
 // Define Schema for Member

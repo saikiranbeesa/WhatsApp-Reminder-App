@@ -9,18 +9,16 @@ const MONGO_URI = process.env.MONGO_URI;
 let client;
 let isReady = false;
 
-// Wait for exactly one global database connection to open before mounting the Auth Strategy
-mongoose.connection.once('open', () => {
-    console.log('WhatsApp RemoteAuth detected MongoDB connection open.');
+function initializeWhatsApp() {
+    console.log('WhatsApp Engine initializing explicitly...');
     const store = new MongoStore({ mongoose: mongoose });
     
     client = new Client({
         authStrategy: new RemoteAuth({
             store: store,
-            backupSyncIntervalMs: 300000 // Backup session every 5 minutes
+            backupSyncIntervalMs: 300000 
         }),
         puppeteer: {
-            // Aggressive Docker flags to completely bypass Render's silent shared memory freezing
             args: [
                 '--no-sandbox', 
                 '--disable-setuid-sandbox', 
@@ -59,7 +57,7 @@ mongoose.connection.once('open', () => {
     client.initialize().catch(err => {
         console.error('Failed to initialize WhatsApp Client:', err);
     });
-});
+}
 
 async function sendGroupMessage(groupName, message) {
     if (!isReady || !client) {
@@ -84,5 +82,6 @@ async function sendGroupMessage(groupName, message) {
 
 module.exports = {
     sendGroupMessage,
-    getClient: () => client
+    getClient: () => client,
+    initializeWhatsApp
 };
