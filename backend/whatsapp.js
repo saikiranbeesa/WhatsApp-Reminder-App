@@ -9,9 +9,9 @@ const MONGO_URI = process.env.MONGO_URI;
 let client;
 let isReady = false;
 
-// Connect to Mongo exclusively for WhatsApp session persistence
-mongoose.connect(MONGO_URI).then(() => {
-    console.log('WhatsApp RemoteAuth securely connected to MongoDB.');
+// Wait for exactly one global database connection to open before mounting the Auth Strategy
+mongoose.connection.once('open', () => {
+    console.log('WhatsApp RemoteAuth detected MongoDB connection open.');
     const store = new MongoStore({ mongoose: mongoose });
     
     client = new Client({
