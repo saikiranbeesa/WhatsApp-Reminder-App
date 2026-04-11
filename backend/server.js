@@ -66,13 +66,9 @@ app.get('/api/test-reminder', auth.verifyToken, async (req, res) => {
     }
 });
 
-// --- Serve React Frontend Dynamically (Monolith) ---
-const buildPath = path.join(__dirname, '../frontend/build');
-app.use(express.static(buildPath));
-
-// Universal fallback to serve the React App for any unhandled GET traffic
-app.use((req, res) => {
-    res.sendFile(path.join(buildPath, 'index.html'));
+// --- Health Check Endpoint (For Render) ---
+app.get('/', (req, res) => {
+    res.status(200).send('WhatsApp Reminder API is running.');
 });
 
 app.listen(port, () => {

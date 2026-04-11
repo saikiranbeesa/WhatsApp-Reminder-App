@@ -4,7 +4,7 @@ import { Toaster, toast } from 'react-hot-toast';
 import { Users, CheckCircle2, XCircle, LayoutDashboard, Mail, KeyRound, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const API_URL = process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 // --- Axios Interceptor to automatically inject JWT token ---
 axios.interceptors.request.use((config) => {

@@ -3,7 +3,7 @@ services:
     name: whatsapp-reminder-monolith
     env: node
     rootDir: backend
-    buildCommand: cd ../frontend && npm install && npm run build && cd ../backend && npm install && npx puppeteer browsers install chrome
+    buildCommand: npm install && npx puppeteer browsers install chrome
     startCommand: node server.js
     envVars:
       - key: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD
