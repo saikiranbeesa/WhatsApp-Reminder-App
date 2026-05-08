@@ -3,7 +3,7 @@ const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 
-const { Member } = require('./db');
+const { getAllMembers, updateMemberStatus, seedMembers } = require('./dbSupabase');
 const auth = require('./auth');
 const scheduler = require('./scheduler'); // Kick off the scheduler
 
@@ -13,6 +13,14 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+const whatsapp = require('./whatsapp');
+seedMembers()
+    .then(() => {
+        console.log('Supabase seeding check complete.');
+        whatsapp.initializeWhatsApp();
+    })
+    .catch((e) => console.error('Seeding error:', e));
+
 // --- Auth Routes ---
 app.post('/api/auth/login', auth.handleLogin);
 
@@ -20,19 +28,21 @@ app.post('/api/auth/login', auth.handleLogin);
 // Get all members (requires valid JWT token)
 app.get('/api/members', auth.verifyToken, async (req, res) => {
     try {
-        const members = await Member.find({});
+        console.log('Frontend requested members...');
+        const members = await getAllMembers();
+        console.log(`Fetched ${members?.length || 0} members from Supabase:`, members);
         
-        // Map _id to id so frontend doesn't break
-        const mappedMembers = members.map(m => ({
-            id: m._id,
+        // Map to the shape the frontend expects
+        const mapped = members.map(m => ({
+            id: m.id,
             name: m.name,
             payment_status: m.payment_status,
-            month: m.month
+            month: m.month,
         }));
-
-        res.json({ members: mappedMembers });
+        res.json({ members: mapped });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error('API Error in /api/members:', err);
+        res.status(500).json({ error: 'Failed to fetch members' });
     }
 });
 
@@ -40,19 +50,31 @@ app.get('/api/members', auth.verifyToken, async (req, res) => {
 app.put('/api/members/:id/status', auth.verifyToken, async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
-    
-    if (status !== 'Paid' && status !== 'Not Paid') {
+    if (!['Paid', 'Not Paid'].includes(status)) {
         return res.status(400).json({ error: 'Invalid status' });
     }
-
     try {
-        const result = await Member.findByIdAndUpdate(id, { payment_status: status });
-        if (!result) {
-            return res.status(404).json({ error: 'Member not found' });
-        }
+        await updateMemberStatus(id, status);
         res.json({ message: 'Status updated successfully' });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error(err);
+        res.status(500).json({ error: 'Failed to update status' });
+    }
+});
+
+// Add a new member (requires valid JWT token)
+app.post('/api/members', auth.verifyToken, async (req, res) => {
+    const { name } = req.body;
+    if (!name || name.trim() === '') {
+        return res.status(400).json({ error: 'Name is required' });
+    }
+    try {
+        const currentMonth = new Date().toLocaleString('default', { month: 'long' });
+        const newMember = await require('./dbSupabase').addMember(name.trim(), currentMonth);
+        res.status(201).json({ member: newMember });
+    } catch (err) {
+        console.error('API Error in POST /api/members:', err);
+        res.status(500).json({ error: 'Failed to add member' });
     }
 });
 

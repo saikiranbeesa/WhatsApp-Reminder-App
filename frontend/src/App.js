@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Toaster, toast } from 'react-hot-toast';
-import { Users, CheckCircle2, XCircle, LayoutDashboard, Mail, KeyRound, LogOut } from 'lucide-react';
+import { Users, CheckCircle2, XCircle, LayoutDashboard, Mail, KeyRound, LogOut, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
@@ -137,6 +137,8 @@ function LoginView({ onLogin }) {
 function DashboardView({ onLogout }) {
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [newMemberName, setNewMemberName] = useState('');
+  const [isAdding, setIsAdding] = useState(false);
 
   const fetchMembers = async () => {
     try {
@@ -168,6 +170,26 @@ function DashboardView({ onLogout }) {
       } else {
         toast.error('Failed to update status.');
       }
+    }
+  };
+
+  const handleAddMember = async (e) => {
+    e.preventDefault();
+    if (!newMemberName.trim()) return;
+    setIsAdding(true);
+    try {
+      const res = await axios.post(`${API_URL}/members`, { name: newMemberName });
+      setMembers([...members, res.data.member]);
+      setNewMemberName('');
+      toast.success('Member added successfully!');
+    } catch (error) {
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        onLogout();
+      } else {
+        toast.error('Failed to add member.');
+      }
+    } finally {
+      setIsAdding(false);
     }
   };
 
@@ -214,10 +236,30 @@ function DashboardView({ onLogout }) {
       </div>
 
       <div>
-        <h2 className="text-xl font-semibold mb-6 flex items-center space-x-2 text-slate-200">
-          <span>Member Directory</span>
-          <span className="bg-slate-800 text-xs px-2.5 py-1 rounded-full border border-slate-700">{totalMembers}</span>
-        </h2>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 space-y-4 sm:space-y-0">
+          <h2 className="text-xl font-semibold flex items-center space-x-2 text-slate-200">
+            <span>Member Directory</span>
+            <span className="bg-slate-800 text-xs px-2.5 py-1 rounded-full border border-slate-700">{totalMembers}</span>
+          </h2>
+          <form onSubmit={handleAddMember} className="flex items-center space-x-2">
+            <input
+              type="text"
+              value={newMemberName}
+              onChange={(e) => setNewMemberName(e.target.value)}
+              placeholder="New member name..."
+              className="px-4 py-2 border border-slate-700 bg-slate-800/50 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
+              required
+            />
+            <button
+              type="submit"
+              disabled={isAdding}
+              className="flex items-center space-x-1 px-4 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/30 text-emerald-300 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
+            >
+              <Plus className="w-4 h-4" />
+              <span>{isAdding ? 'Adding...' : 'Add'}</span>
+            </button>
+          </form>
+        </div>
         
         {loading ? (
           <div className="flex justify-center items-center py-20">

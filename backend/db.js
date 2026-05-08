@@ -3,7 +3,11 @@ require('dotenv').config();
 
 const MONGO_URI = process.env.MONGO_URI;
 
-mongoose.connect(MONGO_URI)
+mongoose.connect(MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 30000
+})
     .then(async () => {
         console.log('Connected to MongoDB Cloud Database.');
         await seedDefaultMembers();
@@ -50,7 +54,7 @@ async function seedDefaultMembers() {
     }
 }
 
-// Ensure the seed runs
-seedDefaultMembers();
+// Ensure the seed runs (already called after successful connection)
+// seedDefaultMembers();
 
 module.exports = { mongoose, Member };

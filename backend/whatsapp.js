@@ -1,34 +1,18 @@
-const { Client, RemoteAuth } = require('whatsapp-web.js');
-const { MongoStore } = require('wwebjs-mongo');
-const mongoose = require('mongoose');
+const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 require('dotenv').config();
-
-const MONGO_URI = process.env.MONGO_URI;
 
 let client;
 let isReady = false;
 
 function initializeWhatsApp() {
     console.log('WhatsApp Engine initializing explicitly...');
-    const store = new MongoStore({ mongoose: mongoose });
     
     client = new Client({
-        authStrategy: new RemoteAuth({
-            store: store,
-            backupSyncIntervalMs: 300000 
-        }),
+        authStrategy: new LocalAuth(),
         puppeteer: {
-            args: [
-                '--no-sandbox', 
-                '--disable-setuid-sandbox', 
-                '--disable-dev-shm-usage', 
-                '--disable-accelerated-2d-canvas', 
-                '--no-first-run', 
-                '--no-zygote', 
-                '--single-process', 
-                '--disable-gpu'
-            ]
+            // Simplified for local Windows compatibility
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
         }
     });
 
@@ -43,10 +27,6 @@ function initializeWhatsApp() {
         console.log('Simply click the link below to view it perfectly clear in your browser:');
         console.log(cleanQrUrl);
         console.log('================================================================\n');
-    });
-
-    client.on('remote_session_saved', () => {
-        console.log('WhatsApp Session successfully backed up to MongoDB Atlas!');
     });
 
     client.on('authenticated', () => {
@@ -81,7 +61,12 @@ async function sendGroupMessage(groupName, message) {
             await client.sendMessage(groupChat.id._serialized, message);
             console.log(`Successfully sent message to group: ${groupName}`);
         } else {
-            console.error(`Group "${groupName}" not found. Message aborted.`);
+            console.error(`❌ Group "${groupName}" not found. Message aborted.`);
+            const availableGroups = chats.filter(c => c.isGroup).map(c => c.name);
+            console.log('--- Available Groups Your Bot Can See ---');
+            console.log(availableGroups.join('\n'));
+            console.log('-----------------------------------------');
+            console.log('Make sure the exact name above matches the TARGET_GROUP_NAME in scheduler.js (including emojis and spaces).');
         }
     } catch (err) {
         console.error('Failed to send group message:', err);
