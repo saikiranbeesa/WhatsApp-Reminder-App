@@ -67,7 +67,7 @@ function LoginView({ onLogin }) {
       const response = await axios.post(`${API_URL}/auth/login`, { userid, password });
       localStorage.setItem('auth_token', response.data.token);
       toast.success('Authentication successful!');
-      onLogin();    
+      onLogin();
     } catch (error) {
       toast.error(error.response?.data?.error || 'Invalid credentials.');
     } finally {
@@ -76,7 +76,7 @@ function LoginView({ onLogin }) {
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
@@ -84,7 +84,7 @@ function LoginView({ onLogin }) {
     >
       <div className="absolute -top-20 -right-20 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl" />
       <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-indigo-500/20 rounded-full blur-3xl" />
-      
+
       <div className="text-center mb-8 relative z-10">
         <div className="mb-4 inline-flex p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
           <KeyRound className="w-8 h-8 text-blue-400" />
@@ -157,6 +157,7 @@ function DashboardView({ onLogout }) {
 
   useEffect(() => {
     fetchMembers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const updateStatus = async (id, newStatus) => {
@@ -201,31 +202,31 @@ function DashboardView({ onLogout }) {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="max-w-6xl mx-auto space-y-8">
       <header className="flex items-center justify-between mb-12">
         <div className="flex items-center space-x-4">
-            <div className="p-3 bg-blue-500/20 rounded-2xl border border-blue-500/30">
-                <LayoutDashboard className="w-8 h-8 text-blue-400" />
-            </div>
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight text-white">Payment Tracker</h1>
-                <p className="text-slate-400 mt-1">Manage monthly subscriptions securely.</p>
-            </div>
+          <div className="p-3 bg-blue-500/20 rounded-2xl border border-blue-500/30">
+            <LayoutDashboard className="w-8 h-8 text-blue-400" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-white">Payment Tracker</h1>
+            <p className="text-slate-400 mt-1">Manage monthly subscriptions securely.</p>
+          </div>
         </div>
         <div className="flex items-center space-x-3">
-            <button onClick={async () => {
-                const toastId = toast.loading('Dispatching message...');
-                try {
-                    const res = await axios.get(`${API_URL}/test-reminder`);
-                    toast.success(res.data.message || 'Message sent! Check WhatsApp.', { id: toastId });
-                } catch (e) {
-                    toast.error('Bot offline or not ready.', { id: toastId });
-                }
-            }} className="flex items-center space-x-2 px-4 py-2 bg-blue-900/40 hover:bg-blue-800/60 border border-blue-700 rounded-xl text-sm font-medium text-blue-300 transition-colors">
-                <Mail className="w-4 h-4" />
-                <span>Test Bot</span>
-            </button>
-            <button onClick={onLogout} className="flex items-center space-x-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-sm font-medium text-slate-300 transition-colors">
-                <LogOut className="w-4 h-4" />
-                <span>Logout</span>
-            </button>
+          <button onClick={async () => {
+            const toastId = toast.loading('Dispatching message...');
+            try {
+              const res = await axios.get(`${API_URL}/test-reminder`);
+              toast.success(res.data.message || 'Message sent! Check WhatsApp.', { id: toastId });
+            } catch (e) {
+              toast.error('Bot offline or not ready.', { id: toastId });
+            }
+          }} className="flex items-center space-x-2 px-4 py-2 bg-blue-900/40 hover:bg-blue-800/60 border border-blue-700 rounded-xl text-sm font-medium text-blue-300 transition-colors">
+            <Mail className="w-4 h-4" />
+            <span>Test Bot</span>
+          </button>
+          <button onClick={onLogout} className="flex items-center space-x-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-sm font-medium text-slate-300 transition-colors">
+            <LogOut className="w-4 h-4" />
+            <span>Logout</span>
+          </button>
         </div>
       </header>
 
@@ -260,7 +261,7 @@ function DashboardView({ onLogout }) {
             </button>
           </form>
         </div>
-        
+
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
@@ -276,7 +277,7 @@ function DashboardView({ onLogout }) {
                 })
                 .map(member => (
                   <MemberCard key={member.id} member={member} onUpdate={updateStatus} />
-              ))}
+                ))}
             </AnimatePresence>
           </div>
         )}
@@ -305,11 +306,11 @@ function MemberCard({ member, onUpdate }) {
     <motion.div layout initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} whileHover={{ scale: 1.02, translateY: -4 }} transition={{ type: "spring", stiffness: 300, damping: 20 }} className={`p-5 rounded-3xl border backdrop-blur-md relative overflow-hidden flex flex-col justify-between min-h-[160px] shadow-lg ${isPaid ? 'bg-emerald-950/20 border-emerald-500/20' : 'bg-slate-900/50 border-slate-800'}`}>
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center space-x-4">
-          <img 
-            src={photoUrl} 
-            onError={(e) => { 
-                e.target.onerror = null; 
-                e.target.src = `https://api.dicebear.com/9.x/initials/svg?seed=${member.name}&backgroundColor=1e293b&textColor=cbd5e1`; 
+          <img
+            src={photoUrl}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = `https://api.dicebear.com/9.x/initials/svg?seed=${member.name}&backgroundColor=1e293b&textColor=cbd5e1`;
             }}
             alt={member.name}
             className={`w-16 h-16 rounded-full border-2 object-cover ${isPaid ? 'border-emerald-500/50 shadow-[0_0_10px_rgba(16,185,129,0.4)]' : 'border-slate-700'}`}
