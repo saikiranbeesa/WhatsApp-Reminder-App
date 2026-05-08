@@ -7,12 +7,24 @@ let isReady = false;
 
 function initializeWhatsApp() {
     console.log('WhatsApp Engine initializing explicitly...');
+    const puppeteerArgs = ['--no-sandbox', '--disable-setuid-sandbox'];
     
+    // If running in the cloud (Render), we need aggressive flags to prevent memory crashes
+    if (process.env.RENDER || process.env.NODE_ENV === 'production') {
+        puppeteerArgs.push(
+            '--disable-dev-shm-usage', 
+            '--disable-accelerated-2d-canvas', 
+            '--no-first-run', 
+            '--no-zygote', 
+            '--single-process', 
+            '--disable-gpu'
+        );
+    }
+
     client = new Client({
         authStrategy: new LocalAuth(),
         puppeteer: {
-            // Simplified for local Windows compatibility
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
+            args: puppeteerArgs
         }
     });
 
