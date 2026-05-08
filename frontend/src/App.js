@@ -140,25 +140,24 @@ function DashboardView({ onLogout }) {
   const [newMemberName, setNewMemberName] = useState('');
   const [isAdding, setIsAdding] = useState(false);
 
-  const fetchMembers = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/members`);
-      setMembers(response.data.members || []);
-    } catch (error) {
-      if (error.response?.status === 401 || error.response?.status === 403) {
-        onLogout(); // Session expired
-      } else {
-        toast.error('Failed to load members.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/members`);
+        setMembers(response.data.members || []);
+      } catch (error) {
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          onLogout(); // Session expired
+        } else {
+          toast.error('Failed to load members.');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchMembers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [onLogout]);
 
   const updateStatus = async (id, newStatus) => {
     try {
